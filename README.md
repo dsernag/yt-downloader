@@ -40,6 +40,18 @@ sudo apt install ffmpeg
    pip install -r requirements.txt
    ```
 
+
+### Providing YouTube Cookies
+
+YouTube frequently blocks requests to confirm that the user is not a bot. To bypass this, you **must** export your YouTube cookies and provide them to this application.
+
+1. Install a browser extension to export cookies (e.g., "Get cookies.txt LOCALLY" for Chrome/Firefox).
+2. Go to `https://www.youtube.com/` and ensure you are logged in.
+3. Use the extension to export the cookies to a file.
+4. Save the exported file as `cookies.txt` in the root directory of this repository (the same folder as `main.py`).
+
+**Note:** The application will refuse to start downloads if `cookies.txt` is missing.
+
 ## Running the Application
 
 Start the FastAPI server using `uvicorn`:
