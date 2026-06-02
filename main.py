@@ -40,7 +40,9 @@ def download_video(request: DownloadRequest, background_tasks: BackgroundTasks):
     if not is_valid_youtube_url(url):
         raise HTTPException(status_code=400, detail="Invalid YouTube URL provided. Please provide a valid youtube.com or youtu.be link.")
 
-    # Generate a unique ID for the output file to avoid collisions on concurrent requests
+    if not os.path.exists("cookies.txt"):
+        raise HTTPException(status_code=500, detail="cookies.txt file not found. Please provide a cookies.txt file in the root directory to authenticate with YouTube.")
+
     unique_id = str(uuid.uuid4())
     temp_filename_template = f"temp_{unique_id}.%(ext)s"
 
@@ -52,6 +54,7 @@ def download_video(request: DownloadRequest, background_tasks: BackgroundTasks):
         'noplaylist': True, # Only download a single video if a playlist is provided
         'quiet': True,
         'no_warnings': True,
+        'cookiefile': 'cookies.txt',
     }
 
     try:

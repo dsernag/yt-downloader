@@ -23,6 +23,16 @@ def test_is_valid_youtube_url_logic():
     assert is_valid_youtube_url("https://youtu.be/dQw4w9WgXcQ") is True
     assert is_valid_youtube_url("https://example.com") is False
 
+
+def test_missing_cookies():
+    # Ensure cookies.txt does not exist
+    if os.path.exists("cookies.txt"):
+        os.remove("cookies.txt")
+
+    response = client.post("/download", json={"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"})
+    assert response.status_code == 500
+    assert "cookies.txt file not found" in response.json()["detail"]
+
 @patch("main.yt_dlp.YoutubeDL")
 def test_successful_download(mock_ydl):
     # Setup mock
@@ -39,11 +49,17 @@ def test_successful_download(mock_ydl):
         "requested_downloads": [{"filepath": dummy_filepath}]
     }
 
+    # Create a dummy cookies.txt file for test
+    with open("cookies.txt", "w") as f:
+        f.write("# Netscape HTTP Cookie File")
+
     response = client.post("/download", json={"url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ"})
 
     # Cleanup dummy file just in case background task didn't run in test context
     if os.path.exists(dummy_filepath):
         os.remove(dummy_filepath)
+    if os.path.exists("cookies.txt"):
+        os.remove("cookies.txt")
 
     assert response.status_code == 200
     assert response.headers["content-type"] == "video/mp4"
